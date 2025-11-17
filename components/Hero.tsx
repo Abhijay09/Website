@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { motion, Variants, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion, Variants } from 'framer-motion';
 import Button from './ui/Button';
 import { useTheme } from '../App';
 
@@ -18,21 +18,12 @@ const Hero: React.FC = () => {
     visible: { y: "0%", transition: { duration: 0.8, ease: [0.6, 0.01, -0.05, 0.95] } },
   };
 
-  const targetRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end start"],
-  });
-
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
   return (
-    <section ref={targetRef} className="min-h-screen flex flex-col justify-center items-center text-center relative px-6 md:px-24 lg:px-44 pt-24 pb-12">
+    <section className="flex flex-col justify-center items-center text-center relative px-6 md:px-24 lg:px-44 pt-48 pb-24">
       <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-brand-light"></div>
       
-      <motion.div style={{ y: textY, opacity }} className="relative z-10">
+      <div className="relative z-10">
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -83,7 +74,7 @@ const Hero: React.FC = () => {
             <a href="#cinematics"><Button size="lg">Our Films</Button></a>
           </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
 
     </section>
   );

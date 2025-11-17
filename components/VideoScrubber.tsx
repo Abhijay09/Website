@@ -5,12 +5,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const FRAME_COUNT = 447;
-const INTRO_FRAME_COUNT = 20;
-const PIN_START_FRAME = 40;
-const PIN_END_FRAME = 70;
-// Slow animation by doubling durations
-const RELATIVE_DURATION_UNITS = (1 + 2 + 5 + 3) * 2;
-const PIXELS_PER_UNIT = 600;
+// --- REDUCED CONSTANTS FOR INSTANT EFFECT ---
+const PIXELS_PER_UNIT = 80; // Drastically smaller value
+const RELATIVE_DURATION_UNITS = 10; // Simplified duration
 const TOTAL_SCROLL_PIXELS = RELATIVE_DURATION_UNITS * PIXELS_PER_UNIT;
 const FRAME_PATH = (index: number) => `/frames/${String(index + 1).padStart(4, "0")}.webp`;
 
@@ -295,11 +292,13 @@ const VideoScrubberUltraOptimized: React.FC = () => {
       targetFrame = clamp(Math.floor(frameState.frame));
     };
 
-    totalTL.to(frameState, { frame: INTRO_FRAME_COUNT, duration: 1.6 * 2, onUpdate: updateTarget });
-    totalTL.to(frameState, { frame: PIN_START_FRAME, duration: 4 * 2, onUpdate: updateTarget });
-    totalTL.to(frameState, { frame: PIN_END_FRAME, duration: 10 * 2, onUpdate: updateTarget });
-    totalTL.to(frameState, { frame: Math.floor(FRAME_COUNT * 0.6), duration: 1.6 * 2, onUpdate: updateTarget });
-    totalTL.to(frameState, { frame: FRAME_COUNT - 1, duration: 4 * 2, onUpdate: updateTarget });
+    // --- REPLACED THE MULTI-STAGE TIMELINE WITH THIS SINGLE LINE ---
+    // This makes the animation play from start to finish without any built-in delay.
+    totalTL.to(frameState, { 
+        frame: FRAME_COUNT - 1, 
+        onUpdate: updateTarget 
+    });
+
 
     // ensure ScrollTrigger layout is correct (we set height earlier in useLayoutEffect)
     try {

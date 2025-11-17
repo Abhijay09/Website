@@ -16,7 +16,7 @@ const FeaturedWorks: React.FC = () => {
 
     return (
         <section id="cinematics" className="pb-20 md:pb-32 bg-transparent">
-            <div className="container mx-auto px-6 md:px-24 lg:px-44 pt-20 md:pt-32">
+            <div className="container mx-auto px-6 md:px-24 lg:px-44">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
