@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { MethodologyStep } from '../types';
-import { ArrowIcon } from '../components/icons/ArrowIcon';
 import { useTheme } from '../App';
 import PageLayout from '../components/PageLayout';
 
@@ -33,93 +32,104 @@ const steps: MethodologyStep[] = [
     }
 ];
 
-interface AccordionItemProps {
+interface TimelineItemProps {
     step: MethodologyStep;
-    isOpen: boolean;
-    onToggle: () => void;
+    index: number;
     textColor: any;
     grayColor: any;
 }
 
-const AccordionItem: React.FC<AccordionItemProps> = ({ step, isOpen, onToggle, textColor, grayColor }) => {
-    
+const TimelineItem: React.FC<TimelineItemProps> = ({ step, index, textColor, grayColor }) => {
+    const isEven = index % 2 === 0;
+
+    const cardVariants = {
+        hidden: { 
+            opacity: 0, 
+            x: isEven ? -100 : 100,
+            scale: 0.9
+        },
+        visible: { 
+            opacity: 1, 
+            x: 0,
+            scale: 1,
+            transition: { type: 'spring', stiffness: 50, damping: 20 }
+        }
+    };
+
     return (
-        <motion.div
-            className="border-b border-zinc-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-        >
-            <button
-                className="w-full flex justify-between items-center py-8 text-left"
-                onClick={onToggle}
+        <div className={`flex ${isEven ? 'flex-row-reverse' : 'flex-row'} items-center w-full mb-8`}>
+            {/* Content Card */}
+            <motion.div 
+                className="w-full md:w-5/12"
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
             >
-                <div className="flex items-center space-x-6">
-                    <span className="text-xl" style={{ color: grayColor }}>{step.id}</span>
-                    <h3 className="text-2xl md:text-4xl font-bold tracking-tight" style={{ color: textColor }}>
+                <div className="p-6 md:p-8 bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-zinc-200">
+                    <p className="text-xl font-semibold mb-2" style={{ color: grayColor }}>{step.id}</p>
+                    <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-4" style={{ color: textColor }}>
                         {step.title}
                     </h3>
+                    <p className="text-base md:text-lg leading-relaxed" style={{ color: grayColor }}>
+                        {step.content}
+                    </p>
                 </div>
-                <motion.div
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    style={{ color: grayColor }}
-                >
-                    <ArrowIcon />
-                </motion.div>
-            </button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                    >
-                        <p className="pb-8 pl-12 max-w-3xl text-lg" style={{ color: grayColor }}>
-                            {step.content}
-                        </p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
+            </motion.div>
+            
+            {/* Timeline Connector */}
+            <div className="hidden md:flex w-2/12 items-center justify-center">
+                <motion.div 
+                    className="w-4 h-4 rounded-full border-2" 
+                    style={{ borderColor: grayColor }}
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ delay: 0.2 }}
+                />
+            </div>
+
+            {/* Empty Spacer for alignment */}
+            <div className="hidden md:block w-5/12"></div>
+        </div>
     );
 };
 
 const AboutPageContent: React.FC = () => {
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
     const { textColor, grayColor } = useTheme();
 
-    const handleToggle = (index: number) => {
-        setOpenIndex(openIndex === index ? null : index);
-    };
-
     return (
-        <section className="py-20 md:py-32">
-            <div className="container mx-auto px-6 md:px-24 lg:px-44">
+        <section className="py-24 md:py-32">
+            <div className="container mx-auto px-6 md:px-12 lg:px-24">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.5 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="text-left mb-16 max-w-3xl"
+                    className="text-center mb-20 max-w-3xl mx-auto"
                 >
-                    <h2 className="text-4xl md:text-6xl font-extrabold tracking-tighter" style={{ color: textColor }}>
-                        The People Behind Miraclestar
+                    <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter" style={{ color: textColor }}>
+                        The Miraclestar Story
                     </h2>
                     <p className="text-lg md:text-xl mt-4" style={{ color: grayColor }}>
-                      Established under the able guidance of visionaries with decades of industry experience, Miraclestar is committed to quality and dedication in all its productions.
+                      Established under the able guidance of visionaries with decades of industry experience, committed to quality and dedication in all productions.
                     </p>
                 </motion.div>
 
-                <div className="bg-white/50 p-4 sm:p-8 rounded-lg shadow-md backdrop-blur-sm">
+                <div className="relative">
+                    {/* The Central Timeline Bar */}
+                    <motion.div 
+                        className="hidden md:block absolute top-0 left-1/2 w-1 h-full bg-zinc-300 -translate-x-1/2"
+                        initial={{ scaleY: 0 }}
+                        animate={{ scaleY: 1 }}
+                        transition={{ duration: 1, ease: 'easeInOut', delay: 0.5 }}
+                        style={{ transformOrigin: 'top' }}
+                    />
+                    
                     {steps.map((step, index) => (
-                        <AccordionItem
+                        <TimelineItem
                             key={step.id}
                             step={step}
-                            isOpen={openIndex === index}
-                            onToggle={() => handleToggle(index)}
+                            index={index}
                             textColor={textColor}
                             grayColor={grayColor}
                         />
