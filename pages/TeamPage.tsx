@@ -1,70 +1,157 @@
-import React from 'react';
-import { motion, Variants } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, Variants, AnimatePresence } from 'framer-motion';
 import PageLayout from '../components/PageLayout';
+import { TeamMember } from '../types';
+import TeamMemberDetail from '../components/TeamMemberDetails';
 
-const teamMembers = [
-  { id: 1, name: 'John Doe', role: 'Director', imageUrl: `https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=400&auto=format&fit=crop` },
-  { id: 2, name: 'Jane Smith', role: 'Producer', imageUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop` },
-  { id: 3, name: 'Mike Johnson', role: 'Lead Animator', imageUrl: `https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop` },
-  { id: 4, name: 'Emily Davis', role: 'VFX Supervisor', imageUrl: `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop` },
-  { id: 5, name: 'Chris Lee', role: 'Sound Designer', imageUrl: `https://images.unsplash.com/photo-1581382575275-97901c2635b7?q=80&w=400&auto=format&fit=crop` },
-  { id: 6, name: 'Sarah Brown', role: 'Screenwriter', imageUrl: `https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop` },
-  { id: 7, name: 'David Wilson', role: 'Cinematographer', imageUrl: `https://images.unsplash.com/photo-1583192134026-193c0d76b5b6?q=80&w=400&auto=format&fit=crop` },
-  { id: 8, name: 'Laura Taylor', role: 'Editor', imageUrl: `https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=400&auto=format&fit=crop` },
+const teamMembers: TeamMember[] = [
+  { 
+    id: 1, name: 'Mayank P. Srivastava', role: 'Writer – Editor – Film Director', 
+    imageUrl: `https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=400&auto=format&fit=crop`,
+    bio: `A one-man army in filmmaking, Mayank integrates all aspects of the craft with professional finesse. With over 25 years in electronic media, he left a UN position to pursue his passion, founding a production house and creating a wide range of content.\nHe has a passion for exploring new ideas and transforming them into compelling stories. He is also a guest faculty in Mass Communications at many universities, having mentored over 800 students.`,
+    projects: ['Love Hackers (Crime Thriller)', 'Kala Sach – The Black Truth (Docu-drama)', 'Creative campaigns for Skill India Mission']
+  },
+  { 
+    id: 2, name: 'Brijesh Srivastava', role: 'Creative & Executive Producer', 
+    imageUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop`,
+    bio: `With a professional journey of over 20 years starting with Aaj Tak and DD News, Brijesh has a strong background in creative and managerial roles. As a founding partner at ABHILASHA GROUP, he handled major responsibilities in Editorials, Media Management, and Film Productions.\nHe has successfully managed productions in Russia, France, and Bangkok, and his work on "Aadhi Abadi" was appreciated in the Parliament of India.`,
+    projects: ['LOVE HACKERS (Executive Producer)', 'Kala Sach-The Black Truth (Executive Producer)', 'TV Shows: AAP KI BAAT, BAATEIN CAREER KI', 'Campaigns for Skill India & Beti Bachayo-Beti Padayo']
+  },
+  { 
+    id: 3, name: 'Jeevesh Mukut', role: 'Financial Consultant', 
+    imageUrl: `https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop`,
+    bio: `With a keen interest in Finance and Management, Jeevesh pursued his education from reputed universities in India (Christ University) and Singapore (NUS Business School). His experience in multinationals like HSBC and Welspun has equipped him with the required skillset and knowledge in the dynamic market.`,
+    projects: ['Assurance Associate at PwC Singapore', 'M.Sc. Management @NUS Business School']
+  },
+  { 
+    id: 4, name: 'Abhijay Shrivastava', role: 'Director: 2D & 3D Animation', 
+    imageUrl: `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop`,
+    bio: `Abhijay is a 2D & 3D Animator and software programmer with expertise in sketching and visualization. He has created numerous published illustrations and has won three Hackathons. Currently pursuing B.Tech at Manipal University, he is the head of the Graphic Design Club and a programmer at Solocursor Studio.`,
+    projects: ['Love Hackers (Lead Animator)'],
+    skills: ['Blender', 'Aseprite', 'Inkscape', 'DaVinci Resolve', 'Clip Studio Paint', 'Photoshop', 'HTML', 'Java', 'JavaScript', 'Python', 'C++', 'CSS', 'C#', 'GDScript']
+  },
+  { 
+    id: 5, name: 'Lokesh Sonkar', role: 'VFX Director', 
+    imageUrl: `https://images.unsplash.com/photo-1581382575275-97901c2635b7?q=80&w=400&auto=format&fit=crop`,
+    bio: `Lokesh has extensive experience heading VFX direction and creation at various studios. His expertise has been crucial in numerous high-profile commercials and series.`,
+    projects: ['Sultan of Delhi', 'Duranga 2', 'Rocket Boys', 'Attack', 'Love Hackers (Upcoming)', 'The Privet Eye (Hollywood, Upcoming)'],
+    skills: ['Autodesk MAYA/MAX', 'Arnold', 'V-Ray', 'Houdini', 'UNREAL', 'Nuke-X', 'Flame', 'AI Graphic Tools']
+  },
+  { 
+    id: 6, name: 'Rahul Desai', role: 'CG / VFX Supervisor', 
+    imageUrl: `https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop`,
+    bio: `A seasoned CG/VFX Supervisor with over 18 years of high-end experience in animation and visual effects, including AI-driven VFX integration. He has a proven expertise in overseeing all phases of production from bidding to final delivery at globally recognized studios.`,
+    projects: ['Transformers: Rise of the Beasts', 'Sonic The Hedgehog 2', 'KGF', 'Pathaan', 'RRR', 'Tanhaji: The Unsung Warrior'],
+    skills: ['MAYA/MAX', 'Arnold', 'V-Ray', 'Houdini', 'UNREAL', 'Nuke-X', 'Flame', 'Generative AI']
+  },
+  { 
+    id: 7, name: 'Vinod A Gundre', role: 'Shoot VFX Supervisor', 
+    imageUrl: `https://images.unsplash.com/photo-1583192134026-193c0d76b5b6?q=80&w=400&auto=format&fit=crop`,
+    bio: `With 20 years of experience in the field of VFX, Vinod has handled numerous jobs with reputed companies in Bollywood. He has a strong background in heading departments, quality control, client communication, and on-set shoot supervision.`,
+    projects: ['Heading Roto, Paint, Match move & Compositing at various studios', 'Shoot Supervisor for numerous Bollywood Movies & Web Series'],
+    skills: ['Nuke', 'Silhouette', 'Photoshop', '3D Equalizer', 'VFX Paint', 'Compositing', 'Python']
+  },
 ];
 
-const containerVariants: Variants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.08 } },
+const TeamMemberCard: React.FC<{
+  member: TeamMember;
+  index: number;
+  onClick: () => void;
+}> = ({ member, index, onClick }) => {
+    
+    const isOdd = index % 2 !== 0;
+
+    const cardVariants: Variants = {
+        hidden: { opacity: 0, x: isOdd ? 150 : -150, y: 150, rotateY: isOdd ? -20 : 20, rotateX: 10 },
+        visible: { opacity: 1, x: 0, y: 0, rotateY: 0, rotateX: 0, transition: { type: 'spring', stiffness: 50, damping: 16, mass: 1.2 } },
+    };
+
+    return (
+        <motion.div
+            className="w-full max-w-sm"
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            onClick={onClick}
+            style={{ perspective: 800 }}
+        >
+            <motion.div 
+                layoutId={`card-container-${member.id}`}
+                className="relative group overflow-hidden rounded-lg shadow-2xl cursor-pointer"
+                whileHover={{ y: -10, scale: 1.03, transition: { type: 'spring', stiffness: 300 } }}
+            >
+                <motion.img layoutId={`card-image-${member.id}`} src={member.imageUrl} alt={member.name} className="w-full h-96 object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-6">
+                    <motion.h3 layoutId={`card-name-${member.id}`} className="text-white text-2xl font-bold">{member.name}</motion.h3>
+                    <motion.p layoutId={`card-role-${member.id}`} className="text-zinc-200">{member.role}</motion.p>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
 };
 
-const memberVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 150, damping: 20 } },
-};
 
 const TeamPage: React.FC = () => {
+    const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+
+    useEffect(() => {
+        if (selectedMember) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [selectedMember]);
+
     return (
         <PageLayout>
-            <section className="py-20 md:py-32">
-                <div className="container mx-auto px-6 md:px-24 lg:px-44">
+            <section className="py-24 md:py-32">
+                <div className="container mx-auto px-6 md:px-12 lg:px-24">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-center mb-16"
+                        className="text-center mb-20"
                     >
-                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-brand-dark">
-                            Our Creative Team
+                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-brand-dark">
+                            Our Creative Force
                         </h1>
                         <p className="text-lg md:text-xl max-w-3xl mx-auto mt-4 text-brand-gray">
                             A harmonious blend of rich experience and young technocrats, dedicated to quality and innovation.
                         </p>
                     </motion.div>
                     
-                    <motion.div 
-                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        {teamMembers.map(member => (
-                            <motion.div key={member.id} variants={memberVariants}>
-                                <motion.div 
-                                    className="relative group overflow-hidden rounded-lg shadow-lg"
-                                    whileHover={{ y: -8, transition: { type: 'spring', stiffness: 300 } }}
-                                >
-                                    <img src={member.imageUrl} alt={member.name} className="w-full h-80 object-cover" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
-                                        <h3 className="text-white text-xl font-bold">{member.name}</h3>
-                                        <p className="text-zinc-300">{member.role}</p>
-                                    </div>
-                                </motion.div>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                    <div className="space-y-12 md:space-y-20">
+                        <div className="flex flex-wrap justify-center gap-12">
+                            {teamMembers.slice(0, 2).map((member, index) => (
+                               <TeamMemberCard key={member.id} member={member} index={index} onClick={() => setSelectedMember(member)} />
+                            ))}
+                        </div>
+                        
+                        <div className="flex flex-wrap justify-center gap-12">
+                             {teamMembers.slice(2, 5).map((member, index) => (
+                               <TeamMemberCard key={member.id} member={member} index={index + 2} onClick={() => setSelectedMember(member)} />
+                            ))}
+                        </div>
+
+                         <div className="flex flex-wrap justify-center gap-12">
+                            {teamMembers.slice(5, 7).map((member, index) => (
+                               <TeamMemberCard key={member.id} member={member} index={index + 5} onClick={() => setSelectedMember(member)} />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
+
+            <AnimatePresence>
+                {selectedMember && (
+                    <TeamMemberDetail member={selectedMember} onClose={() => setSelectedMember(null)} />
+                )}
+            </AnimatePresence>
         </PageLayout>
     );
 };

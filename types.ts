@@ -1,4 +1,3 @@
-
 export interface Work {
   id: number;
   title: string;
@@ -21,5 +20,10 @@ export interface MethodologyStep {
 
 export interface TeamMember {
   id: number;
+  name: string;
+  role: string;
   imageUrl: string;
+  bio: string;
+  projects?: string[];
+  skills?: string[];
 }
