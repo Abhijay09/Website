@@ -9,12 +9,12 @@ type Service = {
 };
 
 const services: Service[] = [
-  { id: 1, title: 'Animatics & VFX', description: 'Planning to come with Animated feature films & TV Series based on Indian Mythology...' },
-  { id: 2, title: 'Micro Drama', description: 'Delivering a complete dramatic arc in under 5 minutes, optimized for mobile screens...' },
-  { id: 3, title: 'Music', description: 'Into Music acquisition, Creation, Marketing & Promotion in the world\'s second-largest market...' },
-  { id: 4, title: 'Film School', description: 'A future-proof curriculum blending storytelling fundamentals with cutting-edge technology...' },
-  { id: 5, title: 'Stock Shots Library', description: 'A comprehensive library of stock shots for various production needs.' },
-  { id: 6, title: 'Feature Films', description: 'Creating compelling narratives and high-quality feature films for a global audience.'}
+  { id: 1, title: 'Animatics & VFX', description: 'Planning to launch Animated feature films & TV Series based on Indian Mythology, beginning with our flagship project "Super Hero Hanuman". Our VFX division is poised to become a global leader, leveraging India\'s growing talent and technology.' },
+  { id: 2, title: 'Micro Drama', description: 'Delivering a complete dramatic arc in under 5 minutes. Optimized for mobile screens and social media, we are in the process of producing a 2-minute Micro Drama series.' },
+  { id: 3, title: 'Music', description: 'Launching Miraclestar Music to handle Music acquisition, Creation, Marketing & Promotion. We aim to capitalize on India being the second-largest music streaming market globally.' },
+  { id: 4, title: 'Film School', description: 'A future-proof curriculum blending storytelling fundamentals with cutting-edge technology, new distribution platforms, and business skills to give students a 360-degree skillset.' },
+  { id: 5, title: 'Stock Shots Library', description: 'A comprehensive library of high-quality stock shots for various production needs, supporting filmmakers and content creators.' },
+  { id: 6, title: 'Feature Films', description: 'Creating compelling narratives and high-quality feature films for a global audience, with projects like "Love Hackers" and "Operation Walnut Cracker".'}
 ];
 
 // Stagger animation for the grid container
