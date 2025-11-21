@@ -3,18 +3,19 @@ import { motion, Variants } from 'framer-motion';
 import PageLayout from '../components/PageLayout';
 
 // --- UPDATED CINEMATIC DATA ---
-// The content now accurately reflects the client's provided descriptions.
 const cinematicWorks = [
     { 
         title: 'Love Hackers', 
         category: 'Feature Film (Releasing Soon)', 
-        imageUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800&auto-format&fit=crop',
+        // Updated to local path (public/cinematics/1.png)
+        imageUrl: '/cinematics/1.png',
         description: 'Inspired by true incidents, Love Hackers reveals how innocent girls are lured through social media into the Dark Web. Priya, a young ethical hacker, joins Police to uncover the truth and save her cousin—while exposing one of the most dangerous networks in India.'
     },
     { 
         title: 'Operation Walnut Cracker', 
         category: 'Spy Thriller (Under Production)', 
-        imageUrl: 'https://images.unsplash.com/photo-1505686994434-e3cc5abf1330?q=80&w=800&auto-format&fit=crop',
+        // Updated to local path (Assuming 2.png exists, otherwise change filename here)
+        imageUrl: '/cinematics/2.png',
         description: 'A Spy thriller Hindi Feature Film, based on espionage and counter-espionage. A complete mind game of Move… Ensnare and… Checkmate, based on true story. It was one of the finest operations led by R&AW and Indian Army that led to the glorious victory against the enemies.'
     },
 ];
@@ -47,14 +48,12 @@ const CinematicsPage: React.FC = () => {
                         className="mb-16 max-w-4xl"
                     >
                         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-brand-dark">Our Cinematic Slate</h1>
-                        {/* --- UPDATED TEXT --- */}
                         <p className="text-lg md:text-xl text-brand-gray mt-4">
                             True cinema goes beyond entertainment – it informs, inspires and uplifts society, leaving a lasting impact on people’s lives.
                         </p>
                     </motion.div>
                     
-                    {/* --- NEW 2-COLUMN LAYOUT --- */}
-                    {/* This layout is optimized to prominently display the two main film projects. */}
+                    {/* --- 2-COLUMN LAYOUT --- */}
                     <motion.div 
                         className="grid grid-cols-1 md:grid-cols-2 gap-8"
                         variants={containerVariants}
@@ -76,6 +75,10 @@ const CinematicsPage: React.FC = () => {
                                     }}
                                     transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                                 >
+                                    {/* 
+                                      Note: React serves files from the 'public' folder at the root path.
+                                      So 'public/cinematics/1.png' becomes '/cinematics/1.png' 
+                                    */}
                                     <img src={work.imageUrl} alt={work.title} className="absolute inset-0 w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 p-8 text-white">
