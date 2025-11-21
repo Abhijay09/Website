@@ -3,17 +3,15 @@ import { motion, Variants, useTime, useTransform } from 'framer-motion';
 import { useTheme } from '../App';
 
 // --- Team Members ---
+// 7 members evenly spaced (360 / 7 ≈ 51.4 degrees apart)
 const teamMembers = [
-  { id: 1, imageUrl: `https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=400&auto=format&fit=crop`, config: { angle: 0 } },
-  { id: 2, imageUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop`, config: { angle: 36 } },
-  { id: 3, imageUrl: `https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&auto=format&fit=crop`, config: { angle: 72 } },
-  { id: 4, imageUrl: `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop`, config: { angle: 108 } },
-  { id: 5, imageUrl: `https://images.unsplash.com/photo-1581382575275-97901c2635b7?q=80&w=400&auto=format&fit=crop`, config: { angle: 144 } },
-  { id: 6, imageUrl: `https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop`, config: { angle: 180 } },
-  { id: 7, imageUrl: `https://images.unsplash.com/photo-1583192134026-193c0d76b5b6?q=80&w=400&auto=format&fit=crop`, config: { angle: 216 } },
-  { id: 8, imageUrl: `https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=400&auto=format&fit=crop`, config: { angle: 252 } },
-  { id: 9, imageUrl: `https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=400&auto=format&fit=crop`, config: { angle: 288 } },
-  { id: 10, imageUrl: `https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=400&auto=format&fit=crop`, config: { angle: 324 } },
+  { id: 1, imageUrl: '/team/1.png', config: { angle: 0 } },
+  { id: 2, imageUrl: '/team/2.png', config: { angle: 51.4 } },
+  { id: 3, imageUrl: '/team/3.png', config: { angle: 102.8 } },
+  { id: 4, imageUrl: '/team/4.png', config: { angle: 154.2 } },
+  { id: 5, imageUrl: '/team/5.png', config: { angle: 205.6 } },
+  { id: 6, imageUrl: '/team/6.png', config: { angle: 257 } },
+  { id: 7, imageUrl: '/team/7.png', config: { angle: 308.4 } },
 ];
 
 // --- Animations ---
@@ -45,7 +43,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
       className="absolute top-1/2 left-1/2"
       style={{
         width: cardSize,
-        height: cardSize * 1.2,
+        height: cardSize * 1.2, // 1.2 Aspect ratio for portrait photos
         transformStyle: 'preserve-3d',
         transform: `
           translateX(${x}px)
@@ -58,7 +56,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
       }}
     >
       <div
-        className="relative w-full h-full rounded-2xl shadow-xl overflow-hidden"
+        className="relative w-full h-full rounded-2xl shadow-xl overflow-hidden bg-white border-2 border-white/20"
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front Face */}
@@ -67,17 +65,24 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
             src={member.imageUrl}
             alt={`Team member ${member.id}`}
             className="w-full h-full object-cover"
+            onError={(e) => {
+                // Fallback in case image is missing
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=Image+Missing'; 
+            }}
           />
         </div>
 
         {/* Back Face */}
         <div
-          className="absolute w-full h-full bg-zinc-200"
+          className="absolute w-full h-full bg-zinc-800 flex items-center justify-center"
           style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
           }}
-        ></div>
+        >
+            {/* Optional: Put logo or texture on back of card */}
+            <span className="text-white/20 font-bold text-xl">Team</span>
+        </div>
       </div>
     </motion.div>
   );
@@ -94,9 +99,10 @@ const Team: React.FC = () => {
     setIsClient(true);
     const checkScreenSize = () => {
       const width = window.innerWidth;
-      const newOrbitSize = Math.max(180, Math.min(width * 0.28, 450));
+      // Adjusted calculations for 7 members to ensure they don't look too sparse
+      const newOrbitSize = Math.max(180, Math.min(width * 0.25, 400));
       setOrbitSize(newOrbitSize);
-      const newCardSize = newOrbitSize * 0.4;
+      const newCardSize = newOrbitSize * 0.45; // Slightly larger cards relative to orbit
       setCardSize(newCardSize);
     };
     checkScreenSize();
@@ -104,6 +110,7 @@ const Team: React.FC = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+  // Loop duration: 30s for a full rotation
   const time = useTime();
   const rotation = useTransform(time, [0, 30000], [0, -360], { clamp: false });
 
@@ -140,7 +147,7 @@ const Team: React.FC = () => {
         </div>
 
         {/* --- ORBIT AREA --- */}
-        <div className="relative z-0 flex items-center justify-center mt-8 md:mt-4">
+        <div className="relative z-0 flex items-center justify-center mt-12 md:mt-8">
           <div
             className="relative flex items-center justify-center"
             style={{
@@ -148,7 +155,7 @@ const Team: React.FC = () => {
               height: orbitSize * 2.5,
               perspective: '1200px',
               perspectiveOrigin: 'center center',
-              overflow: 'hidden',
+              overflow: 'visible', // Changed to visible so cards don't clip during wide rotations
             }}
           >
             {isClient && (
@@ -157,13 +164,18 @@ const Team: React.FC = () => {
                 style={{
                   transformStyle: 'preserve-3d',
                   rotateY: rotation,
-                  rotateX: 15,
-                  translateY: 40,
+                  rotateX: 15, // Slight tilt to see the orbit better
+                  translateY: 20,
                   transformOrigin: 'center center',
                 }}
               >
                 {teamMembers.map((member) => (
-                  <TeamMemberCard key={member.id} member={member} orbitSize={orbitSize} cardSize={cardSize} />
+                  <TeamMemberCard 
+                    key={member.id} 
+                    member={member} 
+                    orbitSize={orbitSize} 
+                    cardSize={cardSize} 
+                  />
                 ))}
               </motion.div>
             )}
@@ -173,7 +185,7 @@ const Team: React.FC = () => {
 
         {/* Bottom Text */}
         <motion.div
-          className="w-full relative text-center z-10 mt-auto pt-8"
+          className="w-full relative text-center z-10 mt-auto pt-12"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.5 }}

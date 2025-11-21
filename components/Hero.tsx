@@ -31,7 +31,7 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="mb-8"
         >
-          <motion.span style={{ color: grayColor }} className="uppercase tracking-widest text-sm">A new Era of Audio & Visual Excellence</motion.span>
+          <motion.span style={{ color: grayColor }} className="uppercase tracking-widest text-sm">A new Era in Audio & Visual Excellence</motion.span>
         </motion.div>
         
         <motion.h1 

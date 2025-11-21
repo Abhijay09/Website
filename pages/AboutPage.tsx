@@ -4,16 +4,19 @@ import { MethodologyStep } from '../types';
 import { useTheme } from '../App';
 import PageLayout from '../components/PageLayout';
 
-const steps: MethodologyStep[] = [
+// 1. Update the data to include the images
+const steps: (MethodologyStep & { image?: string })[] = [
     {
         id: '01',
         title: 'Shri Kamal Mukut',
-        content: 'With 52 years in Bollywood as a Distributor, Multiplex owner, and Producer of acclaimed hits like Gadar 2, Genius, and Mad. A co-founder of Zee TV, he was solely responsible for its entire filmed content and awarded the "PILLAR OF ZEE". He pioneered concepts like Telefilms and developed India’s first multiplex in a non-metro market, Jaipur. He has recently acquired a chain of multiplexes in North India.'
+        content: 'With 52 years in Bollywood as a Distributor, Multiplex owner, and Producer of acclaimed hits like Gadar 2, Genius, and Mad. A co-founder of Zee TV, he was solely responsible for its entire filmed content and awarded the "PILLAR OF ZEE". He pioneered concepts like Telefilms and developed India’s first multiplex in a non-metro market, Jaipur. He has recently acquired a chain of multiplexes in North India.',
+        image: '/team/8.png' 
     },
     {
         id: '02',
         title: 'Hemmant Mukut',
-        content: 'Founder of Miraclestar Entertainments, engaged in Production, Acquisition, and Distribution. He believes in meaningful cinema that entertains and imparts important messages to society. His feature film on the Dark Web is complete and awaiting release. His elder brother, Deepak Mukut, is also a renowned film Producer and Distributor.'
+        content: 'Founder of Miraclestar Entertainments, engaged in Production, Acquisition, and Distribution. He believes in meaningful cinema that entertains and imparts important messages to society. His feature film on the Dark Web is complete and awaiting release. His elder brother, Deepak Mukut, is also a renowned film Producer and Distributor.',
+        image: '/team/9.png'
     },
     {
         id: '03',
@@ -33,7 +36,7 @@ const steps: MethodologyStep[] = [
 ];
 
 interface TimelineItemProps {
-    step: MethodologyStep;
+    step: MethodologyStep & { image?: string };
     index: number;
     textColor: any;
     grayColor: any;
@@ -45,7 +48,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ step, index, textColor, gra
     const cardVariants = {
         hidden: { 
             opacity: 0, 
-            x: isEven ? -100 : 100,
+            x: isEven ? -50 : 50, // Reduced distance for smoother feel
             scale: 0.9
         },
         visible: { 
@@ -56,9 +59,25 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ step, index, textColor, gra
         }
     };
 
+    // Animation for the image appearing from the opposite side
+    const imageVariants = {
+        hidden: { 
+            opacity: 0, 
+            x: isEven ? 50 : -50, 
+            scale: 0.9 
+        },
+        visible: { 
+            opacity: 1, 
+            x: 0, 
+            scale: 1,
+            transition: { type: 'spring', stiffness: 50, damping: 20, delay: 0.2 }
+        }
+    };
+
     return (
-        <div className={`flex ${isEven ? 'flex-row-reverse' : 'flex-row'} items-center w-full mb-8`}>
-            {/* Content Card */}
+        <div className={`flex ${isEven ? 'flex-row-reverse' : 'flex-row'} items-center w-full mb-12 md:mb-20`}>
+            
+            {/* 1. Content Card (Text) */}
             <motion.div 
                 className="w-full md:w-5/12"
                 variants={cardVariants}
@@ -66,7 +85,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ step, index, textColor, gra
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
             >
-                <div className="p-6 md:p-8 bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-zinc-200">
+                <div className="p-6 md:p-8 bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-zinc-200 hover:shadow-xl transition-shadow duration-300">
                     <p className="text-xl font-semibold mb-2" style={{ color: grayColor }}>{step.id}</p>
                     <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-4" style={{ color: textColor }}>
                         {step.title}
@@ -77,10 +96,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ step, index, textColor, gra
                 </div>
             </motion.div>
             
-            {/* Timeline Connector */}
-            <div className="hidden md:flex w-2/12 items-center justify-center">
+            {/* 2. Timeline Connector */}
+            <div className="hidden md:flex w-2/12 items-center justify-center relative">
                 <motion.div 
-                    className="w-4 h-4 rounded-full border-2" 
+                    className="w-4 h-4 rounded-full border-2 bg-white z-10" 
                     style={{ borderColor: grayColor }}
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
@@ -89,8 +108,25 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ step, index, textColor, gra
                 />
             </div>
 
-            {/* Empty Spacer for alignment */}
-            <div className="hidden md:block w-5/12"></div>
+            {/* 3. Image Section (Replaces the empty spacer) */}
+            <div className="hidden md:flex w-5/12 justify-center items-center">
+                {step.image && (
+                    <motion.div
+                        variants={imageVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.3 }}
+                        className="w-full max-w-sm"
+                    >
+                        <img 
+                            src={step.image} 
+                            alt={step.title} 
+                            className="w-full h-auto rounded-lg shadow-xl object-cover border border-zinc-100"
+                            style={{ maxHeight: '500px' }} 
+                        />
+                    </motion.div>
+                )}
+            </div>
         </div>
     );
 };
@@ -118,10 +154,10 @@ const AboutPageContent: React.FC = () => {
                 <div className="relative">
                     {/* The Central Timeline Bar */}
                     <motion.div 
-                        className="hidden md:block absolute top-0 left-1/2 w-1 h-full bg-zinc-300 -translate-x-1/2"
+                        className="hidden md:block absolute top-0 left-1/2 w-px h-full bg-zinc-300 -translate-x-1/2"
                         initial={{ scaleY: 0 }}
                         animate={{ scaleY: 1 }}
-                        transition={{ duration: 1, ease: 'easeInOut', delay: 0.5 }}
+                        transition={{ duration: 1.5, ease: 'easeInOut' }}
                         style={{ transformOrigin: 'top' }}
                     />
                     

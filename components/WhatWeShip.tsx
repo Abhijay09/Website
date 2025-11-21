@@ -9,7 +9,7 @@ type Service = {
 };
 
 const services: Service[] = [
-  { id: 1, title: 'Animatics & VFX', description: 'Planning to come with Animated feature films & TV Series based on Indian Mythology...' },
+  { id: 1, title: 'Animatics & VFX', description: 'Coming soon with Animated feature films & TV Series based on Indian Mythology...' },
   { id: 2, title: 'Micro Drama', description: 'Delivering a complete dramatic arc in under 5 minutes, optimized for mobile screens...' },
   { id: 3, title: 'Music', description: 'Into Music acquisition, Creation, Marketing & Promotion in the world\'s second-largest market...' },
   { id: 4, title: 'Film School', description: 'A future-proof curriculum blending storytelling fundamentals with cutting-edge technology...' },

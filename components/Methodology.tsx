@@ -7,7 +7,7 @@ const steps: MethodologyStep[] = [
     {
         id: '01',
         title: 'Shri Kamal Mukut',
-        content: 'With 52 years in Bollywood as a Distributor, Multiplex owner, and Producer of acclaimed hits like Gadar 2, Genius, and Mad.'
+        content: 'With 53 years in Bollywood as a Distributor, Multiplex owner, and Producer of acclaimed hits like Gadar 2, Genius, and Mad.'
     },
     {
         id: '02',
@@ -27,7 +27,7 @@ const steps: MethodologyStep[] = [
     {
         id: '05',
         title: 'The Core Team',
-        content: 'Our team consists of seasoned professionals and talented individuals in finance, animation, and VFX.'
+        content: 'Our team consists of seasoned professionals and talented individuals in Direction, Vizualisation, Animation, VFX, Sound, Editing & Finance.'
     }
 ];
 
