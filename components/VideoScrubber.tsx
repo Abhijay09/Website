@@ -1,13 +1,14 @@
 // VideoScrubberUltra.optimized.tsx
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
+import { createPortal } from "react-dom"; // Added to render outside stacking contexts
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const FRAME_COUNT = 447;
-// --- REDUCED CONSTANTS FOR INSTANT EFFECT ---
-const PIXELS_PER_UNIT = 80; // Drastically smaller value
-const RELATIVE_DURATION_UNITS = 10; // Simplified duration
+// --- ADJUSTED CONSTANTS FOR LONGER DURATION ---
+const PIXELS_PER_UNIT = 200; 
+const RELATIVE_DURATION_UNITS = 40; 
 const TOTAL_SCROLL_PIXELS = RELATIVE_DURATION_UNITS * PIXELS_PER_UNIT;
 const FRAME_PATH = (index: number) => `/frames/${String(index + 1).padStart(4, "0")}.webp`;
 
@@ -91,6 +92,24 @@ const VideoScrubberUltraOptimized: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
+  const [domReady, setDomReady] = useState(false);
+
+  // Check if document is available for Portal
+  useEffect(() => {
+    setDomReady(true);
+  }, []);
+
+  // --- Disable scrolling while loading ---
+  useEffect(() => {
+    if (loading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [loading]);
 
   // loader effect (concurrency-controlled)
   useEffect(() => {
@@ -292,8 +311,6 @@ const VideoScrubberUltraOptimized: React.FC = () => {
       targetFrame = clamp(Math.floor(frameState.frame));
     };
 
-    // --- REPLACED THE MULTI-STAGE TIMELINE WITH THIS SINGLE LINE ---
-    // This makes the animation play from start to finish without any built-in delay.
     totalTL.to(frameState, { 
         frame: FRAME_COUNT - 1, 
         onUpdate: updateTarget 
@@ -331,8 +348,10 @@ const VideoScrubberUltraOptimized: React.FC = () => {
       className="relative w-full"
       style={{ height: containerHeight ? `${containerHeight}px` : `${TOTAL_SCROLL_PIXELS + 800}px` }}
     >
-      {loading && (
-        <div className="fixed inset-0 flex flex-col justify-center items-center bg-white text-black z-50">
+      {loading && domReady && createPortal(
+        // UPDATED: Used createPortal to render this directly into the body, 
+        // ensuring it sits above all other stacking contexts (like headers or transforms).
+        <div className="fixed inset-0 flex flex-col justify-center items-center bg-white text-black z-[9999]">
           <div className="text-2xl font-bold mb-4">Loading Cinematic Experience...</div>
           <div className="w-1/2 max-w-md h-2 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
@@ -342,7 +361,8 @@ const VideoScrubberUltraOptimized: React.FC = () => {
               transition={{ ease: "linear", duration: 0.12 }}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div ref={stickyRef} className="sticky top-0 w-full h-screen">

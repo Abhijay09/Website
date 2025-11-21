@@ -15,8 +15,9 @@ const FeaturedWorks: React.FC = () => {
     };
 
     return (
-        <section id="cinematics" className="pb-20 md:pb-32 bg-transparent">
-            <div className="container mx-auto px-6 md:px-24 lg:px-44">
+        <section id="cinematics" className="pb-20 md:pb-32 bg-transparent relative">
+            {/* Text Content - z-10 ensures it stays on top of the video */}
+            <div className="container mx-auto px-6 md:px-24 lg:px-44 relative z-10 pointer-events-none">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
@@ -33,10 +34,12 @@ const FeaturedWorks: React.FC = () => {
                 </motion.div>
             </div>
 
-            {/* The old card stack is replaced with the new cinematic video scrubber. */}
-            <VideoScrubber />
+            {/* Video Scrubber - Pulled up by 1500px on desktop (previously 1000px) */}
+            <div className="-mt-64 md:-mt-[1500px] relative z-0">
+                <VideoScrubber />
+            </div>
 
-            <div className="container mx-auto px-6 md:px-24 lg:px-44">
+            <div className="container mx-auto px-6 md:px-24 lg:px-44 relative z-10">
                 <motion.div
                     className="text-center mt-20"
                     initial={{ opacity: 0, y: 20 }}

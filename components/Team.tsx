@@ -10,7 +10,7 @@ const teamMembers = [
   { id: 3, imageUrl: '/team/3.png', config: { angle: 102.8 } },
   { id: 4, imageUrl: '/team/4.png', config: { angle: 154.2 } },
   { id: 5, imageUrl: '/team/5.png', config: { angle: 205.6 } },
-  { id: 6, imageUrl: '/team/6.png', config: { angle: 257 } },
+  { id: 6, imageUrl: '/team/6re.png', config: { angle: 257 } },
   { id: 7, imageUrl: '/team/7.png', config: { angle: 308.4 } },
 ];
 
