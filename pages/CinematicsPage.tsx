@@ -2,60 +2,72 @@ import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import PageLayout from '../components/PageLayout';
 
-// --- UPDATED CINEMATIC DATA ---
+// --- DATA ---
 const cinematicWorks = [
     { 
+        id: 1,
         title: 'Love Hackers', 
-        category: 'Feature Film (Releasing Soon)', 
-        // Updated to local path (public/cinematics/1.png)
+        status: 'Releasing Soon',
+        genre: 'Crime Thriller',
         imageUrl: '/cinematics/1.png',
-        description: 'Inspired by true incidents, Love Hackers reveals how innocent girls are lured through social media into the Dark Web. Priya, a young ethical hacker, joins Police to uncover the truth and save her cousin—while exposing one of the most dangerous networks in India.'
+        description: 'Inspired by true incidents, Love Hackers reveals how innocent girls are lured through social media into the Dark Web. Priya, a young ethical hacker, joins Police to uncover the truth and save her cousin—while exposing one of the most dangerous networks in India.',
+        color: 'from-red-600/10 to-purple-600/10' // Subtle glow
     },
     { 
+        id: 2,
         title: 'Operation Walnut Cracker', 
-        category: 'Spy Thriller (Under Production)', 
-        // Updated to local path (Assuming 2.png exists, otherwise change filename here)
+        status: 'Under Production',
+        genre: 'Spy Thriller',
         imageUrl: '/cinematics/2.png',
-        description: 'A Spy thriller Hindi Feature Film, based on espionage and counter-espionage. A complete mind game of Move… Ensnare and… Checkmate, based on true story. It was one of the finest operations led by R&AW and Indian Army that led to the glorious victory against the enemies.'
+        description: 'A complete mind game of Move… Ensnare and… Checkmate. Based on a true story, this film chronicles one of the finest operations led by R&AW and the Indian Army that led to a glorious victory against enemy forces in a high-stakes game of espionage.',
+        color: 'from-blue-600/10 to-emerald-600/10' // Subtle glow
     },
 ];
 
-// Animation for the main grid container to orchestrate the stagger effect
 const containerVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.15 } },
+  visible: { transition: { staggerChildren: 0.2 } },
 };
 
-// A "scale and fade" entrance animation for each card
 const cardVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
+  hidden: { opacity: 0, y: 30 },
   visible: { 
     opacity: 1, 
-    scale: 1, 
-    transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } 
+    y: 0, 
+    transition: { type: 'spring', stiffness: 100, damping: 20 } 
   }
 };
 
 const CinematicsPage: React.FC = () => {
     return (
         <PageLayout>
-            <section className="py-24 md:py-32">
-                <div className="container mx-auto px-6 md:px-12 lg:px-24">
+            <section className="py-24 md:py-32 relative overflow-hidden">
+                {/* Decorative Background Elements - Toned down for sleekness */}
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-purple-200 rounded-full mix-blend-multiply filter blur-[150px] opacity-30"></div>
+                    <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-100 rounded-full mix-blend-multiply filter blur-[150px] opacity-40"></div>
+                </div>
+
+                <div className="container mx-auto px-6 md:px-12 lg:px-24 relative z-10">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }} 
                         animate={{ opacity: 1, y: 0 }} 
                         transition={{ duration: 0.8 }}
-                        className="mb-16 max-w-4xl"
+                        className="mb-20 max-w-4xl"
                     >
-                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-brand-dark">Our Cinematic Slate</h1>
-                        <p className="text-lg md:text-xl text-brand-gray mt-4">
-                            True cinema goes beyond entertainment – it informs, inspires and uplifts society, leaving a lasting impact on people’s lives.
+                        <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter text-brand-dark mb-6">
+                            The Slate
+                        </h1>
+                        {/* Reduced font size: text-lg md:text-xl */}
+                        <p className="text-lg md:text-xl text-brand-gray max-w-2xl leading-relaxed">
+                            Stories that challenge reality. Visuals that define a generation. 
+                            <span className="block mt-2 text-brand-dark font-medium">Experience the new era of Miraclestar.</span>
                         </p>
                     </motion.div>
                     
-                    {/* --- 2-COLUMN LAYOUT --- */}
+                    {/* --- CARDS GRID --- */}
                     <motion.div 
-                        className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                        className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
@@ -64,27 +76,48 @@ const CinematicsPage: React.FC = () => {
                             <motion.div 
                                 key={work.title} 
                                 variants={cardVariants} 
-                                className="group"
-                                style={{ perspective: 1000 }}
+                                className="group relative"
                             >
+                                {/* Ambient Glow Behind Card - Tighter and cleaner */}
+                                <div className={`absolute -inset-1 bg-gradient-to-br ${work.color} rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
+
                                 <motion.div 
-                                    className="relative overflow-hidden rounded-lg shadow-2xl h-[32rem] w-full"
-                                    whileHover={{
-                                        y: -10,
-                                        boxShadow: '0px 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                                    }}
-                                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                                    className="relative bg-zinc-950 rounded-xl overflow-hidden shadow-2xl border border-zinc-800/50 flex flex-col h-full"
+                                    whileHover={{ y: -5 }}
+                                    transition={{ type: 'spring', stiffness: 200, damping: 25 }}
                                 >
-                                    {/* 
-                                      Note: React serves files from the 'public' folder at the root path.
-                                      So 'public/cinematics/1.png' becomes '/cinematics/1.png' 
-                                    */}
-                                    <img src={work.imageUrl} alt={work.title} className="absolute inset-0 w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                                    <div className="absolute bottom-0 left-0 p-8 text-white">
-                                        <h3 className="text-3xl font-bold tracking-tight">{work.title}</h3>
-                                        <p className="text-zinc-300 uppercase text-sm tracking-wider mt-1">{work.category}</p>
-                                        <p className="mt-4 text-base text-zinc-100 max-w-prose">{work.description}</p>
+                                    {/* Image Area */}
+                                    <div className="relative w-full aspect-video overflow-hidden bg-black border-b border-zinc-800/50">
+                                        <div className="absolute inset-0 bg-zinc-900 animate-pulse" />
+                                        <motion.img 
+                                            src={work.imageUrl} 
+                                            alt={work.title} 
+                                            className="relative w-full h-full object-contain z-10 transition-transform duration-700 group-hover:scale-105" 
+                                        />
+                                        
+                                        {/* Seamless fade to black at bottom of image */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-20 opacity-80" />
+                                    </div>
+
+                                    {/* Content Area */}
+                                    <div className="p-8 flex-grow flex flex-col relative z-30">
+                                        {/* Badges - Minimalist */}
+                                        <div className="flex flex-wrap gap-2 mb-5">
+                                            <span className="px-3 py-1 rounded-md border border-zinc-800 bg-zinc-900 text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                                                {work.genre}
+                                            </span>
+                                            <span className="px-3 py-1 rounded-md bg-white text-black text-[10px] font-bold tracking-widest uppercase">
+                                                {work.status}
+                                            </span>
+                                        </div>
+
+                                        <h3 className="text-3xl font-bold tracking-tight text-white mb-4 group-hover:text-zinc-200 transition-colors">
+                                            {work.title}
+                                        </h3>
+                                        
+                                        <p className="text-zinc-400 text-base leading-relaxed flex-grow">
+                                            {work.description}
+                                        </p>
                                     </div>
                                 </motion.div>
                             </motion.div>

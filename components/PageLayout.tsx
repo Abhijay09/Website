@@ -1,58 +1,54 @@
-import React, { useRef, createContext, useContext } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import React, { createContext } from 'react';
+import { motion, useMotionValue } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
 import { ThemeContext } from '../App';
 
 interface PageLayoutProps {
   children: React.ReactNode;
+  theme?: 'light' | 'dark'; // Allows individual pages to be fully Dark or Light
 }
 
-const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
-  const footerRef = useRef<HTMLDivElement>(null);
+const PageLayout: React.FC<PageLayoutProps> = ({ children, theme = 'light' }) => {
+  // --- 1. Main Page Theme Logic ---
+  const isDark = theme === 'dark';
 
-  // Create scroll progress for footer
-  const { scrollYProgress: scrollYProgressFooter } = useScroll({
-    target: footerRef,
-    offset: ["start end", "end start"]
-  });
+  // Static Background for the main content area
+  const backgroundColor = isDark ? "#18181b" : "#F0EEE9";
+  
+  // Text colors for the main content (passed to Header and Children)
+  const mainTextColor = useMotionValue(isDark ? "#F0EEE9" : "#0F0F0F");
+  const mainGrayColor = useMotionValue(isDark ? "#a1a1aa" : "#525252");
 
-  const transitionRange: [number, number, number, number] = [0, 0.25, 0.75, 1];
-
-  const footerDarkness = useTransform(
-    scrollYProgressFooter,
-    transitionRange,
-    [0, 1, 1, 0]
-  );
-
-  const backgroundColor = useTransform(
-    footerDarkness,
-    [0, 1],
-    ["#F0EEE9", "#18181b"]
-  );
-
-  const textColor = useTransform(
-    footerDarkness,
-    [0, 1],
-    ["#0F0F0F", "#F0EEE9"]
-  );
-
-  const grayColor = useTransform(
-    footerDarkness,
-    [0, 1],
-    ["#525252", "#a1a1aa"]
-  );
+  // --- 2. Footer Theme Logic (ALWAYS DARK) ---
+  // We force these values for the footer section so it always looks like "Dark Mode"
+  const footerTextColor = useMotionValue("#F0EEE9"); // White text
+  const footerGrayColor = useMotionValue("#a1a1aa"); // Light Gray text
 
   return (
-    <ThemeContext.Provider value={{ textColor, grayColor }}>
-      <motion.div className="overflow-x-hidden" style={{ backgroundColor }}>
+    // Provider for the Header and Main Content
+    <ThemeContext.Provider value={{ textColor: mainTextColor, grayColor: mainGrayColor }}>
+      <motion.div 
+        className="overflow-x-hidden min-h-screen flex flex-col" 
+        style={{ backgroundColor }}
+      >
         <Header />
-        <main>
+        
+        <main className="flex-grow">
           {children}
         </main>
-        <div ref={footerRef}>
-          <Footer />
-        </div>
+
+        {/* 
+            FOOTER SECTION 
+            Wrapped in a nested ThemeProvider to force Dark Mode styles 
+            regardless of the page's main theme.
+        */}
+        <ThemeContext.Provider value={{ textColor: footerTextColor, grayColor: footerGrayColor }}>
+          <div className="bg-[#18181b] w-full">
+            <Footer />
+          </div>
+        </ThemeContext.Provider>
+
       </motion.div>
     </ThemeContext.Provider>
   );
