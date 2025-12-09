@@ -12,7 +12,8 @@ import AboutPage from './pages/AboutPage';
 import CinematicsPage from './pages/CinematicsPage';
 import DivisionsPage from './pages/DivisionsPage';
 import TeamPage from './pages/TeamPage';
-import ScrollToTop from './components/ScrollToTop'; // Import the ScrollToTop component
+import ContactPage from './pages/ContactPage'; // <--- Added Import
+import ScrollToTop from './components/ScrollToTop';
 
 // 1. Create and export the Theme Context and a custom hook to use it
 interface ThemeContextType {
@@ -96,6 +97,7 @@ const App: React.FC = () => {
         <Route path="/cinematics" element={<CinematicsPage />} />
         <Route path="/divisions" element={<DivisionsPage />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/contact" element={<ContactPage />} /> {/* <--- Added Route */}
       </Routes>
     </>
   );
