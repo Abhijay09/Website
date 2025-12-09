@@ -14,6 +14,7 @@ const Footer: React.FC = () => {
             className="py-20 px-6 md:px-24 lg:px-44 bg-transparent"
         >
             <div className="container mx-auto">
+                {/* Main CTA - Only visible on Home Page */}
                 {isHomePage && (
                     <div className="text-center mb-16">
                          <div className="overflow-hidden">
@@ -61,6 +62,7 @@ const Footer: React.FC = () => {
                     </div>
                 )}
 
+                {/* Bottom Bar - Copyright Only */}
                 <motion.div 
                     className="flex flex-col md:flex-row justify-between items-center text-center md:text-left border-t border-zinc-300 pt-10"
                     initial={{ opacity: 0 }}
@@ -72,12 +74,9 @@ const Footer: React.FC = () => {
                         <motion.p className="text-lg font-bold" style={{ color: textColor }}>Miraclestar Entertainments</motion.p>
                         <motion.p style={{ color: grayColor }}>&copy; {new Date().getFullYear()}. All Rights Reserved</motion.p>
                     </div>
-                    <div className="flex space-x-6">
-                        <motion.a href="#" style={{ color: grayColor, '--hover-color': textColor } as any} whileHover={{ color: 'var(--hover-color)' }} className="transition-colors">Twitter</motion.a>
-                        <motion.a href="#" style={{ color: grayColor, '--hover-color': textColor } as any} whileHover={{ color: 'var(--hover-color)' }} className="transition-colors">Instagram</motion.a>
-                        <motion.a href="#" style={{ color: grayColor, '--hover-color': textColor } as any} whileHover={{ color: 'var(--hover-color)' }} className="transition-colors">LinkedIn</motion.a>
-                        <motion.a href="#" style={{ color: grayColor, '--hover-color': textColor } as any} whileHover={{ color: 'var(--hover-color)' }} className="transition-colors">Dribbble</motion.a>
-                    </div>
+                    
+                    {/* Social Media Links Removed */}
+                    
                 </motion.div>
             </div>
         </footer>
