@@ -4,7 +4,7 @@ import PageLayout from '../components/PageLayout';
 
 // --- CONFIGURATION ---
 // REPLACE THIS WITH YOUR EMAIL ADDRESS
-const RECIPIENT_EMAIL = "contact@miraclestar.com"; 
+const RECIPIENT_EMAIL = "films@miraclestar.co.in"; 
 // ---------------------
 
 const ContactPage: React.FC = () => {
