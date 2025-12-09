@@ -56,12 +56,15 @@ const CinematicsPage: React.FC = () => {
                         className="mb-20 max-w-4xl"
                     >
                         <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter text-brand-dark mb-6">
-                            The Slate
+                            The Cinematic Slate
                         </h1>
-                        {/* Reduced font size: text-lg md:text-xl */}
-                        <p className="text-lg md:text-xl text-brand-gray max-w-2xl leading-relaxed">
+                        {/* 
+                            Updated Text Color: text-zinc-700
+                            This unifies both lines to a color darker than brand-gray but lighter than brand-dark.
+                        */}
+                        <p className="text-lg md:text-xl text-zinc-700 max-w-2xl leading-relaxed font-medium">
                             Stories that challenge reality. Visuals that define a generation. 
-                            <span className="block mt-2 text-brand-dark font-medium">Experience the new era of Miraclestar.</span>
+                            <span className="block mt-2">Experience the new era of Miraclestar.</span>
                         </p>
                     </motion.div>
                     
