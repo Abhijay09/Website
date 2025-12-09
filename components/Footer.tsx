@@ -44,20 +44,7 @@ const Footer: React.FC = () => {
                                     Contact Us
                                 </motion.button>
                             </div>
-                            <div className="overflow-hidden">
-                                <motion.a 
-                                    href="mailto:contact@miraclestar.com" 
-                                    className="text-2xl md:text-4xl font-extrabold tracking-tighter transition-colors duration-300 underline inline-block"
-                                    style={{ color: grayColor, '--hover-color': textColor } as any}
-                                    whileHover={{ color: 'var(--hover-color)' }}
-                                    initial={{ y: "100%" }}
-                                    whileInView={{ y: "0%" }}
-                                    viewport={{ once: false }}
-                                    transition={{ duration: 0.8, ease: [0.6, 0.01, -0.05, 0.95], delay: 0.2 }}
-                                >
-                                    Let's talk
-                                </motion.a>
-                            </div>
+                            {/* "Let's talk" link removed here */}
                         </div>
                     </div>
                 )}
@@ -74,9 +61,6 @@ const Footer: React.FC = () => {
                         <motion.p className="text-lg font-bold" style={{ color: textColor }}>Miraclestar Entertainments</motion.p>
                         <motion.p style={{ color: grayColor }}>&copy; {new Date().getFullYear()}. All Rights Reserved</motion.p>
                     </div>
-                    
-                    {/* Social Media Links Removed */}
-                    
                 </motion.div>
             </div>
         </footer>
