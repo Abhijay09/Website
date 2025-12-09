@@ -123,7 +123,8 @@ const TimelineItem: React.FC<TimelineItemProps> = ({ step, index }) => {
             <img 
               src={step.image} 
               alt={step.title} 
-              className="w-full h-auto rounded-xl shadow-xl object-cover border border-zinc-100 aspect-[4/3]"
+              // Changed aspect-[4/3] to aspect-[3/4] (Portrait Mode) to increase height
+              className="w-full h-auto rounded-xl shadow-xl object-cover border border-zinc-100 aspect-[3/4]"
             />
           </motion.div>
         ) : (
