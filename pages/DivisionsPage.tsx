@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import PageLayout from '../components/PageLayout';
 
@@ -23,9 +23,26 @@ const containerVariants: Variants = {
   visible: { transition: { staggerChildren: 0.15 } },
 };
 
-// Card component with the corrected, state-driven 3D flip logic
+// Card component with conditional logic for Mobile vs Laptop
 const DivisionCard: React.FC<{ service: Service; index: number }> = ({ service, index }) => {
     const [isFlipped, setIsFlipped] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // 1. Check if the device is mobile (width < 768px)
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        // Check initially
+        handleResize();
+
+        // Add listener
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const isLeft = index % 2 === 0;
 
@@ -46,16 +63,18 @@ const DivisionCard: React.FC<{ service: Service; index: number }> = ({ service, 
     return (
         <motion.div
             variants={cardVariants}
-            className="w-full h-72 cursor-pointer" // Added cursor-pointer
+            className="w-full h-72 cursor-pointer"
             style={{ perspective: '1200px' }}
-            // Use event handlers on the non-moving parent to control state
-            onHoverStart={() => setIsFlipped(true)}
-            onHoverEnd={() => setIsFlipped(false)}
+            // 2. Conditional Events:
+            // If NOT mobile -> Hover triggers flip
+            onHoverStart={() => !isMobile && setIsFlipped(true)}
+            onHoverEnd={() => !isMobile && setIsFlipped(false)}
+            // If IS mobile -> Click triggers flip toggle
+            onClick={() => isMobile && setIsFlipped(!isFlipped)}
         >
             <motion.div
                 className="relative w-full h-full"
                 style={{ transformStyle: 'preserve-3d' }}
-                // Animate based on the isFlipped state, not direct hover
                 variants={flipVariants}
                 animate={isFlipped ? "flipped" : "initial"}
                 transition={{ duration: 0.6, ease: 'easeInOut' }}
@@ -69,6 +88,11 @@ const DivisionCard: React.FC<{ service: Service; index: number }> = ({ service, 
                         <path d="M20 0L25.8779 14.1221L40 20L25.8779 25.8779L20 40L14.1221 25.8779L0 20L14.1221 14.1221L20 0Z" fill="#F0EEE9"/>
                     </svg>
                     <p className="text-brand-light mt-4 text-xl font-bold tracking-tight">{service.title}</p>
+                    
+                    {/* Small hint only visible on mobile to indicate tapability */}
+                    <p className="mt-4 text-xs text-zinc-500 uppercase tracking-widest md:hidden block">
+                        Tap to view
+                    </p>
                 </div>
 
                 {/* --- BACK FACE (INFO CARD) --- */}
@@ -76,7 +100,7 @@ const DivisionCard: React.FC<{ service: Service; index: number }> = ({ service, 
                     className="absolute w-full h-full p-8 flex flex-col justify-between bg-white rounded-2xl border border-zinc-200 shadow-lg"
                     style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                 >
-                    <div>
+                    <div className="overflow-y-auto">
                         <h3 className="text-2xl font-bold mb-3 text-brand-dark">{service.title}</h3>
                         <p className="text-brand-gray">{service.description}</p>
                     </div>
@@ -104,6 +128,7 @@ const DivisionsPage: React.FC = () => {
           </motion.div>
           
           <motion.div 
+            // Layout preserved exactly as requested
             className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
             variants={containerVariants}
             initial="hidden"

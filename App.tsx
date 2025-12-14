@@ -3,8 +3,8 @@ import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import HomeCinematics from './components/HomeCinematics'; // <--- Import Component
 import WhatWeShip from './components/WhatWeShip';
-import FeaturedWorks from './components/FeaturedWorks';
 import Methodology from './components/Methodology';
 import Team from './components/Team';
 import Footer from './components/Footer';
@@ -12,7 +12,7 @@ import AboutPage from './pages/AboutPage';
 import CinematicsPage from './pages/CinematicsPage';
 import DivisionsPage from './pages/DivisionsPage';
 import TeamPage from './pages/TeamPage';
-import ContactPage from './pages/ContactPage'; // <--- Added Import
+import ContactPage from './pages/ContactPage';
 import ScrollToTop from './components/ScrollToTop';
 
 // 1. Create and export the Theme Context and a custom hook to use it
@@ -71,10 +71,15 @@ const HomePage: React.FC = () => {
         <Header />
         <main>
           <Hero />
-          <FeaturedWorks />
+          
+          {/* New Cinematics Section: Appears in Light Theme */}
+          <HomeCinematics />
+          
+          {/* Theme Transition Triggers Here (Light -> Dark) */}
           <div ref={whatWeShipRef}>
             <WhatWeShip />
           </div>
+          
           <Methodology />
           <Team />
         </main>
@@ -97,7 +102,7 @@ const App: React.FC = () => {
         <Route path="/cinematics" element={<CinematicsPage />} />
         <Route path="/divisions" element={<DivisionsPage />} />
         <Route path="/team" element={<TeamPage />} />
-        <Route path="/contact" element={<ContactPage />} /> {/* <--- Added Route */}
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
     </>
   );
