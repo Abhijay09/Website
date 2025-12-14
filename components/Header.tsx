@@ -6,7 +6,7 @@ import { MenuIcon } from './icons/MenuIcon';
 import { useTheme } from '../App';
 
 // --- CONFIGURATION ---
-const LOGO_SIZE = 100; // Size in pixels
+const LOGO_SIZE = 70; // Size in pixels
 // ---------------------
 
 const Header: React.FC = () => {
