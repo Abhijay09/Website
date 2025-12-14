@@ -6,7 +6,7 @@ import { MenuIcon } from './icons/MenuIcon';
 import { useTheme } from '../App';
 
 // --- CONFIGURATION ---
-const LOGO_SIZE = 60; // Size in pixels
+const LOGO_SIZE = 100; // Size in pixels
 // ---------------------
 
 const Header: React.FC = () => {
@@ -23,7 +23,7 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
+//trigger
   const navLinks = [
     { name: 'Cinematics', href: '/cinematics' },
     { name: 'Divisions', href: '/divisions' },
