@@ -1,12 +1,9 @@
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
-import { useNavigate } from 'react-router-dom'; // Added for navigation
-import Button from './ui/Button';
 import { useTheme } from '../App';
 
 const Hero: React.FC = () => {
   const { textColor, grayColor } = useTheme();
-  const navigate = useNavigate(); // Hook for navigation
   const line1 = "Miraclestar";
   const line2 = "Entertainments";
 
@@ -22,11 +19,6 @@ const Hero: React.FC = () => {
 
   return (
     <section className="flex flex-col justify-center items-center text-center relative px-6 md:px-24 lg:px-44 pt-48 pb-24">
-      {/* 
-        FIX: Removed the 'bg-gradient-to-b' overlay. 
-        This prevents the "hard line" at the bottom of the section, 
-        allowing the global background color change to be fully visible and smooth.
-      */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
       
       <div className="relative z-10">
@@ -66,23 +58,6 @@ const Hero: React.FC = () => {
         >
           A production house that encompasses all aspects of the entertainment industry, committed to quality and dedication in all its productions and striving to create a harmonious work environment.
         </motion.p>
-        
-        <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          <motion.div
-            animate={{ scale: [1, 1.03, 1] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {/* Updated to navigate to the Cinematics Page directly */}
-            <button onClick={() => navigate('/cinematics')}>
-                <Button size="lg">Our Films</Button>
-            </button>
-          </motion.div>
-        </motion.div>
       </div>
 
     </section>
