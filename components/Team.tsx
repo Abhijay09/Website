@@ -6,7 +6,7 @@ import { useTheme } from '../App';
 // --- CONFIGURATION ---
 const CARD_SCALE_RATIO = 0.45;          
 const ORBIT_RADIUS_SCREEN_RATIO = 0.60; 
-const ORBIT_RADIUS_MIN = 180;           
+const ORBIT_RADIUS_MIN = 150;           
 const ORBIT_RADIUS_MAX = 450;           
 
 const HITBOX_SIZE_RATIO = 2.2; // Size of the hover detection area
