@@ -1,9 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { motion, Variants, useTime, useTransform } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, Variants, useMotionValue, useAnimationFrame } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../App';
 
-// --- Team Members ---
-// 7 members evenly spaced (360 / 7 ≈ 51.4 degrees apart)
+// --- CONFIGURATION ---
+const CARD_SCALE_RATIO = 0.45;          
+const ORBIT_RADIUS_SCREEN_RATIO = 0.60; 
+const ORBIT_RADIUS_MIN = 180;           
+const ORBIT_RADIUS_MAX = 450;           
+
+const HITBOX_SIZE_RATIO = 2;            
+
+const TILT_ANGLE = 20;                  
+const CARD_AXIS_OFFSET = -10;           
+
+const NORMAL_SPEED = 0.01;
+const HOVER_SPEED = 0.002;
+const SPEED_INERTIA = 0.1;
+// ---------------------
+
 const teamMembers = [
   { id: 1, imageUrl: '/team/1.png', config: { angle: 0 } },
   { id: 2, imageUrl: '/team/2.png', config: { angle: 51.4 } },
@@ -14,191 +29,230 @@ const teamMembers = [
   { id: 7, imageUrl: '/team/7.png', config: { angle: 308.4 } },
 ];
 
-// --- Animations ---
 const textSlideUp: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
 };
+
 const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
 };
 
-// --- Card Component ---
-type TeamMember = typeof teamMembers[0];
-
+// --- CARD COMPONENT ---
 interface TeamMemberCardProps {
-  member: TeamMember;
+  member: typeof teamMembers[0];
   orbitSize: number;
   cardSize: number;
 }
 
 const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, cardSize }) => {
+  const navigate = useNavigate();
+  
+  // Calculate specific position on the circle
   const angleRad = (member.config.angle * Math.PI) / 180;
   const x = orbitSize * Math.sin(angleRad);
   const z = orbitSize * Math.cos(angleRad);
 
+  // Common Handler
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    navigate('/team', { state: { selectedMemberId: member.id } });
+  };
+
   return (
-    <motion.div
-      className="absolute top-1/2 left-1/2"
+    <div
+      className="absolute cursor-pointer group"
+      onClick={handleClick}
       style={{
         width: cardSize,
-        height: cardSize * 1.2, // 1.2 Aspect ratio for portrait photos
+        height: cardSize * 1.2,
+        top: '50%',
+        left: '50%',
+        marginTop: -(cardSize * 1.2) / 2,
+        marginLeft: -cardSize / 2,
+        
+        // 3D POSITIONING
         transformStyle: 'preserve-3d',
         transform: `
           translateX(${x}px)
           translateY(${z * 0.1}px)
           translateZ(${z}px)
-          translate(-50%, -50%)
           rotateY(${member.config.angle}deg)
-          rotateX(-10deg)
+          rotateX(${CARD_AXIS_OFFSET}deg)
         `,
+        // Important: Ensure this element captures pointer events
+        pointerEvents: 'auto' 
       }}
     >
-      <div
-        className="relative w-full h-full rounded-2xl shadow-xl overflow-hidden bg-white border-2 border-white/20"
+      {/* 
+         WRAPPER: Holds the two faces
+         We add the hover scale here so both faces scale together.
+      */}
+      <div 
+        className="w-full h-full relative transition-transform duration-300 group-hover:scale-105"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Front Face */}
-        <div className="absolute w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
-          <img
-            src={member.imageUrl}
-            alt={`Team member ${member.id}`}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-                // Fallback in case image is missing
-                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=Image+Missing'; 
+          {/* --- FRONT FACE --- */}
+          <div
+            className="absolute inset-0 w-full h-full bg-white rounded-2xl overflow-hidden border border-white/20 shadow-2xl"
+            style={{ 
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden', 
+                zIndex: 2,
             }}
-          />
-        </div>
-
-        {/* Back Face */}
-        <div
-          className="absolute w-full h-full bg-zinc-800 flex items-center justify-center"
-          style={{
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-          }}
-        >
-            {/* Optional: Put logo or texture on back of card */}
-            <span className="text-white/20 font-bold text-xl">Team</span>
-        </div>
+          >
+            <img
+              src={member.imageUrl}
+              alt={`Team member ${member.id}`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=Image+Missing'; 
+              }}
+            />
+          </div>
+          
+          {/* --- BACK FACE (Mirrored) --- */}
+          <div 
+            className="absolute inset-0 w-full h-full bg-white rounded-2xl overflow-hidden border border-white/20 shadow-2xl"
+            style={{ 
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                // Rotate 180 to face backwards
+                transform: 'rotateY(180deg)',
+                zIndex: 1
+            }}
+          >
+             <img
+              src={member.imageUrl}
+              alt={`Team member ${member.id} Back`}
+              className="w-full h-full object-cover"
+              // MIRROR EFFECT: scaleX(-1) makes the image look correct when viewed from behind
+              style={{ transform: 'scaleX(-1)' }} 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=Image+Missing'; 
+              }}
+            />
+            {/* Optional: Slight darkening to indicate "back" side */}
+            <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+          </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
-// --- Main Team Component ---
+// --- MAIN COMPONENT ---
 const Team: React.FC = () => {
-  const { textColor, grayColor, brandGray } = useTheme();
+  const { textColor, grayColor } = useTheme();
   const [isClient, setIsClient] = useState(false);
   const [orbitSize, setOrbitSize] = useState(300);
   const [cardSize, setCardSize] = useState(120);
+  
+  const isHoveringRef = useRef(false);
 
   useEffect(() => {
     setIsClient(true);
     const checkScreenSize = () => {
       const width = window.innerWidth;
-      // Adjusted calculations for 7 members to ensure they don't look too sparse
-      const newOrbitSize = Math.max(180, Math.min(width * 0.25, 400));
+      const newOrbitSize = Math.max(
+          ORBIT_RADIUS_MIN, 
+          Math.min(width * ORBIT_RADIUS_SCREEN_RATIO, ORBIT_RADIUS_MAX)
+      );
       setOrbitSize(newOrbitSize);
-      const newCardSize = newOrbitSize * 0.45; // Slightly larger cards relative to orbit
-      setCardSize(newCardSize);
+      setCardSize(newOrbitSize * CARD_SCALE_RATIO);
     };
+    
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Loop duration: 30s for a full rotation
-  const time = useTime();
-  const rotation = useTransform(time, [0, 30000], [0, -360], { clamp: false });
+  // --- PHYSICS ENGINE ---
+  const rotation = useMotionValue(0);
+  const currentSpeed = useRef(NORMAL_SPEED);
+
+  useAnimationFrame((time, delta) => {
+    const targetSpeed = isHoveringRef.current ? HOVER_SPEED : NORMAL_SPEED;
+    currentSpeed.current = currentSpeed.current + (targetSpeed - currentSpeed.current) * SPEED_INERTIA;
+    rotation.set(rotation.get() - (currentSpeed.current * delta));
+  });
 
   return (
-    <section
-      id="team"
-      className="py-12 md:py-20 px-4 md:px-16 lg:px-24 overflow-hidden relative"
-    >
-      {/* Decorative Side Elements */}
-      <div
-        className="absolute top-1/4 left-0 -translate-x-1/2 w-64 h-64 rounded-full opacity-10 blur-2xl pointer-events-none"
-        style={{ backgroundColor: brandGray }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-1/4 right-0 translate-x-1/2 w-72 h-72 rounded-full opacity-10 blur-3xl pointer-events-none"
-        style={{ backgroundColor: brandGray }}
-        aria-hidden="true"
-      />
-
-      <div className="container mx-auto flex flex-col items-center justify-center min-h-[50vh] md:min-h-[70vh] relative">
-        {/* Headline */}
-        <div className="w-full relative text-center z-10">
-          <motion.h2
-            variants={textSlideUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.5 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter"
-            style={{ color: textColor }}
-          >
-            Our Creative Team
-          </motion.h2>
-        </div>
-
-        {/* --- ORBIT AREA --- */}
-        <div className="relative z-0 flex items-center justify-center mt-12 md:mt-8">
-          <div
-            className="relative flex items-center justify-center"
-            style={{
-              width: orbitSize * 2.5,
-              height: orbitSize * 2.5,
-              perspective: '1200px',
-              perspectiveOrigin: 'center center',
-              overflow: 'visible', // Changed to visible so cards don't clip during wide rotations
-            }}
-          >
-            {isClient && (
-              <motion.div
-                className="relative w-full h-full"
-                style={{
-                  transformStyle: 'preserve-3d',
-                  rotateY: rotation,
-                  rotateX: 15, // Slight tilt to see the orbit better
-                  translateY: 20,
-                  transformOrigin: 'center center',
-                }}
-              >
-                {teamMembers.map((member) => (
-                  <TeamMemberCard 
-                    key={member.id} 
-                    member={member} 
-                    orbitSize={orbitSize} 
-                    cardSize={cardSize} 
-                  />
-                ))}
-              </motion.div>
-            )}
-          </div>
-        </div>
-        {/* --- END ORBIT AREA --- */}
-
-        {/* Bottom Text */}
-        <motion.div
-          className="w-full relative text-center z-10 mt-auto pt-12"
+    <section id="team" className="py-20 md:py-32 overflow-hidden relative min-h-[80vh] flex flex-col items-center justify-center">
+      
+      {/* Title Section */}
+      <div className="w-full relative text-center z-10 mb-12">
+        <motion.h2
+          variants={textSlideUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.5 }}
+          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter"
+          style={{ color: textColor }}
         >
-          <motion.p
-            variants={fadeIn}
-            className="text-center text-lg md:text-xl max-w-3xl mx-auto"
-            style={{ color: grayColor }}
-          >
-            A harmonious blend of rich experience and young technocrats, dedicated to quality and innovation.
-          </motion.p>
-        </motion.div>
+          Our Creative Team
+        </motion.h2>
       </div>
+
+      {/* --- 3D SCENE --- */}
+      <div className="relative z-0 w-full flex justify-center items-center">
+        
+        {/* Hitbox / Interaction Layer */}
+        <div
+          className="relative flex items-center justify-center rounded-full"
+          style={{
+            width: orbitSize * HITBOX_SIZE_RATIO,
+            height: orbitSize * HITBOX_SIZE_RATIO,
+            perspective: '1200px', 
+            transformStyle: 'preserve-3d', // Crucial for click-through
+            // We allow pointer events on this container to track hover...
+            pointerEvents: 'auto',
+          }}
+          onMouseEnter={() => { isHoveringRef.current = true; }}
+          onMouseLeave={() => { isHoveringRef.current = false; }}
+        >
+          {isClient && (
+            <motion.div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                transformStyle: 'preserve-3d',
+                rotateY: rotation, 
+                rotateX: TILT_ANGLE, 
+                // ...but we ensure the rotation div itself doesn't block clicks
+                pointerEvents: 'none'
+              }}
+            >
+              {teamMembers.map((member) => (
+                <TeamMemberCard 
+                  key={member.id} 
+                  member={member} 
+                  orbitSize={orbitSize} 
+                  cardSize={cardSize} 
+                />
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer Text */}
+      <motion.div
+        className="w-full relative text-center z-10 mt-16"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.5 }}
+      >
+        <motion.p
+          variants={fadeIn}
+          className="text-center text-lg md:text-xl max-w-3xl mx-auto px-4"
+          style={{ color: grayColor }}
+        >
+          A harmonious blend of rich experience and young technocrats, dedicated to quality and innovation.
+        </motion.p>
+      </motion.div>
+
     </section>
   );
 };

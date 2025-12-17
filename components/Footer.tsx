@@ -44,23 +44,52 @@ const Footer: React.FC = () => {
                                     Contact Us
                                 </motion.button>
                             </div>
-                            {/* "Let's talk" link removed here */}
                         </div>
                     </div>
                 )}
 
-                {/* Bottom Bar - Copyright Only */}
+                {/* Bottom Bar */}
                 <motion.div 
-                    className="flex flex-col md:flex-row justify-between items-center text-center md:text-left border-t border-zinc-300 pt-10"
+                    className="flex flex-col md:flex-row justify-between items-center md:items-end border-t border-zinc-300 pt-10"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: false, amount: 0.5 }}
                     transition={{ duration: 1.0 }}
                 >
-                    <div className="mb-6 md:mb-0">
-                        <motion.p className="text-lg font-bold" style={{ color: textColor }}>Miraclestar Entertainments</motion.p>
-                        <motion.p style={{ color: grayColor }}>&copy; {new Date().getFullYear()}. All Rights Reserved</motion.p>
+                    {/* LEFT SIDE: Branding & Copyright */}
+                    <div className="flex flex-col items-center md:items-start mb-8 md:mb-0 text-center md:text-left">
+                        <motion.p 
+                            className="text-lg font-bold tracking-tight" 
+                            style={{ color: textColor }}
+                        >
+                            Miraclestar Entertainments
+                        </motion.p>
+                        <motion.p 
+                            className="text-sm mt-1 font-medium" 
+                            style={{ color: grayColor }}
+                        >
+                            &copy; {new Date().getFullYear()}. All Rights Reserved
+                        </motion.p>
                     </div>
+
+                    {/* RIGHT SIDE: Email Info */}
+                    <div className="flex flex-col items-center md:items-end text-center md:text-right">
+                        <motion.span 
+                            className="text-xs uppercase tracking-widest font-bold mb-1" 
+                            style={{ color: grayColor }}
+                        >
+                            Inquiries
+                        </motion.span>
+                        <motion.a 
+                            href="mailto:films@miraclestar.co.in"
+                            // Reduced size (text-base md:text-lg) and removed hover interactions
+                            className="text-base md:text-lg font-medium tracking-tight"
+                            style={{ color: textColor }}
+                        >
+                            films@miraclestar.co.in
+                        </motion.a>
+                    </div>
+
                 </motion.div>
             </div>
         </footer>

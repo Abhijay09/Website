@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom'; // <--- Added Import
 import PageLayout from '../components/PageLayout';
 import { TeamMember } from '../types';
 import TeamMemberDetail from '../components/TeamMemberDetails';
@@ -7,7 +8,7 @@ import TeamMemberDetail from '../components/TeamMemberDetails';
 // --- Data with Local Images ---
 const teamMembers: TeamMember[] = [
   { 
-    id: 1, 
+    id: 2, 
     name: 'Mayank P. Srivastava', 
     role: 'Writer – Editor – Film Director', 
     imageUrl: '/team/2.png',
@@ -15,7 +16,7 @@ const teamMembers: TeamMember[] = [
     projects: ['Love Hackers (Crime Thriller)', 'Kala Sach – The Black Truth (Docu-drama)', 'Creative campaigns for Skill India Mission']
   },
   { 
-    id: 2, 
+    id: 1, 
     name: 'Brijesh Srivastava', 
     role: 'Creative & Executive Producer', 
     imageUrl: '/team/1.png',
@@ -23,7 +24,7 @@ const teamMembers: TeamMember[] = [
     projects: ['LOVE HACKERS (Executive Producer)', 'Kala Sach-The Black Truth (Executive Producer)', 'TV Shows: AAP KI BAAT, BAATEIN CAREER KI', 'Campaigns for Skill India & Beti Bachayo-Beti Padayo']
   },
   { 
-    id: 3, 
+    id: 7, 
     name: 'Jeevesh Mukut', 
     role: 'Financial Consultant', 
     imageUrl: '/team/7.png',
@@ -31,7 +32,7 @@ const teamMembers: TeamMember[] = [
     projects: ['Assurance Associate at PwC Singapore', 'M.Sc. Management @NUS Business School']
   },
   { 
-    id: 4, 
+    id: 5, 
     name: 'Abhijay Shrivastava', 
     role: 'Director: 2D & 3D Animation', 
     imageUrl: '/team/5.png',
@@ -40,7 +41,7 @@ const teamMembers: TeamMember[] = [
     skills: ['Blender', 'Aseprite', 'Inkscape', 'DaVinci Resolve', 'Clip Studio Paint', 'Photoshop', 'HTML', 'Java', 'JavaScript', 'Python', 'C++', 'CSS', 'C#', 'GDScript']
   },
   { 
-    id: 5, 
+    id: 6, 
     name: 'Lokesh Sonkar', 
     role: 'VFX Director', 
     imageUrl: '/team/6re.png',
@@ -49,7 +50,7 @@ const teamMembers: TeamMember[] = [
     skills: ['Autodesk MAYA/MAX', 'Arnold', 'V-Ray', 'Houdini', 'UNREAL', 'Nuke-X', 'Flame', 'AI Graphic Tools']
   },
   { 
-    id: 6, 
+    id: 3, 
     name: 'Rahul Desai', 
     role: 'CG / VFX Supervisor', 
     imageUrl: '/team/3re.png',
@@ -58,7 +59,7 @@ const teamMembers: TeamMember[] = [
     skills: ['MAYA/MAX', 'Arnold', 'V-Ray', 'Houdini', 'UNREAL', 'Nuke-X', 'Flame', 'Generative AI']
   },
   { 
-    id: 7, 
+    id: 4, 
     name: 'Vinod A Gundre', 
     role: 'Shoot VFX Supervisor', 
     imageUrl: '/team/4.png',
@@ -118,6 +119,30 @@ const TeamMemberCard: React.FC<{
 
 const TeamPage: React.FC = () => {
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+    const location = useLocation(); // <--- Get Router Location
+
+    // --- HANDLE AUTOMATIC POPUP FROM HOMEPAGE ---
+    useEffect(() => {
+        // If state exists and has selectedMemberId
+        if (location.state && location.state.selectedMemberId) {
+            const memberId = location.state.selectedMemberId;
+            const member = teamMembers.find(m => m.id === memberId);
+            
+            if (member) {
+                // Slight delay to allow page transition to finish before popup
+                setTimeout(() => {
+                    setSelectedMember(member);
+                    // Optional: Scroll the specific card into view if needed
+                    // const element = document.getElementById(`member-${memberId}`);
+                    // if(element) element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+            
+            // Clear state so it doesn't reopen on refresh (React Router handles this automatically mostly, 
+            // but replacing state is safer if you want it to be one-time)
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     useEffect(() => {
         if (selectedMember) {
