@@ -9,7 +9,7 @@ const ORBIT_RADIUS_SCREEN_RATIO = 0.60;
 const ORBIT_RADIUS_MIN = 180;           
 const ORBIT_RADIUS_MAX = 450;           
 
-const HITBOX_SIZE_RATIO = 2;            
+const HITBOX_SIZE_RATIO = 2.2; // Size of the hover detection area
 
 const TILT_ANGLE = 20;                  
 const CARD_AXIS_OFFSET = -10;           
@@ -44,19 +44,19 @@ interface TeamMemberCardProps {
   member: typeof teamMembers[0];
   orbitSize: number;
   cardSize: number;
+  setHover: (val: boolean) => void;
 }
 
-const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, cardSize }) => {
+const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, cardSize, setHover }) => {
   const navigate = useNavigate();
   
-  // Calculate specific position on the circle
   const angleRad = (member.config.angle * Math.PI) / 180;
   const x = orbitSize * Math.sin(angleRad);
   const z = orbitSize * Math.cos(angleRad);
 
-  // Common Handler
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation(); // Stop propagation
+    e.preventDefault();  // Prevent default
     navigate('/team', { state: { selectedMemberId: member.id } });
   };
 
@@ -64,6 +64,9 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
     <div
       className="absolute cursor-pointer group"
       onClick={handleClick}
+      // Keep hover active when on top of a card
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       style={{
         width: cardSize,
         height: cardSize * 1.2,
@@ -71,8 +74,6 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
         left: '50%',
         marginTop: -(cardSize * 1.2) / 2,
         marginLeft: -cardSize / 2,
-        
-        // 3D POSITIONING
         transformStyle: 'preserve-3d',
         transform: `
           translateX(${x}px)
@@ -81,25 +82,25 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
           rotateY(${member.config.angle}deg)
           rotateX(${CARD_AXIS_OFFSET}deg)
         `,
-        // Important: Ensure this element captures pointer events
-        pointerEvents: 'auto' 
+        // CRITICAL: Auto pointer events ensures this card captures clicks
+        // even if the parent container is set to none.
+        pointerEvents: 'auto',
+        zIndex: 50 // High z-index relative to other elements in 3D context
       }}
     >
-      {/* 
-         WRAPPER: Holds the two faces
-         We add the hover scale here so both faces scale together.
-      */}
+      {/* WRAPPER */}
       <div 
         className="w-full h-full relative transition-transform duration-300 group-hover:scale-105"
         style={{ transformStyle: 'preserve-3d' }}
       >
-          {/* --- FRONT FACE --- */}
+          {/* FRONT FACE */}
           <div
             className="absolute inset-0 w-full h-full bg-white rounded-2xl overflow-hidden border border-white/20 shadow-2xl"
             style={{ 
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden', 
                 zIndex: 2,
+                transform: 'translateZ(1px)' // Fix Z-fighting
             }}
           >
             <img
@@ -112,14 +113,13 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
             />
           </div>
           
-          {/* --- BACK FACE (Mirrored) --- */}
+          {/* BACK FACE */}
           <div 
             className="absolute inset-0 w-full h-full bg-white rounded-2xl overflow-hidden border border-white/20 shadow-2xl"
             style={{ 
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
-                // Rotate 180 to face backwards
-                transform: 'rotateY(180deg)',
+                transform: 'rotateY(180deg) translateZ(1px)', // Fix Z-fighting
                 zIndex: 1
             }}
           >
@@ -127,13 +127,11 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member, orbitSize, card
               src={member.imageUrl}
               alt={`Team member ${member.id} Back`}
               className="w-full h-full object-cover"
-              // MIRROR EFFECT: scaleX(-1) makes the image look correct when viewed from behind
               style={{ transform: 'scaleX(-1)' }} 
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=Image+Missing'; 
               }}
             />
-            {/* Optional: Slight darkening to indicate "back" side */}
             <div className="absolute inset-0 bg-black/5 pointer-events-none" />
           </div>
       </div>
@@ -177,10 +175,15 @@ const Team: React.FC = () => {
     rotation.set(rotation.get() - (currentSpeed.current * delta));
   });
 
+  // Helper to set hover from child components
+  const setHover = (val: boolean) => {
+    isHoveringRef.current = val;
+  };
+
   return (
     <section id="team" className="py-20 md:py-32 overflow-hidden relative min-h-[80vh] flex flex-col items-center justify-center">
       
-      {/* Title Section */}
+      {/* Title */}
       <div className="w-full relative text-center z-10 mb-12">
         <motion.h2
           variants={textSlideUp}
@@ -194,24 +197,43 @@ const Team: React.FC = () => {
         </motion.h2>
       </div>
 
-      {/* --- 3D SCENE --- */}
+      {/* --- 3D SCENE WRAPPER --- */}
       <div className="relative z-0 w-full flex justify-center items-center">
         
-        {/* Hitbox / Interaction Layer */}
+        {/* 
+            LAYER 1: HOVER SENSOR (Background)
+            This captures the hover event for the empty space between cards.
+            It has a lower Z-Index so cards always render "on top" of it for clicks.
+        */}
         <div
-          className="relative flex items-center justify-center rounded-full"
+          className="absolute rounded-full"
           style={{
             width: orbitSize * HITBOX_SIZE_RATIO,
             height: orbitSize * HITBOX_SIZE_RATIO,
-            perspective: '1200px', 
-            transformStyle: 'preserve-3d', // Crucial for click-through
-            // We allow pointer events on this container to track hover...
-            pointerEvents: 'auto',
+            zIndex: 0, 
           }}
-          onMouseEnter={() => { isHoveringRef.current = true; }}
-          onMouseLeave={() => { isHoveringRef.current = false; }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+        />
+
+        {/* 
+            LAYER 2: 3D ROTATION CONTAINER
+            This contains the cards.
+            pointer-events: none -> Allows clicks to pass through empty space to the sensor or background.
+            z-index: 10 -> Ensures this layer sits ABOVE the sensor, so cards are always clickable.
+        */}
+        <div
+            className="relative flex items-center justify-center"
+            style={{
+              width: orbitSize * 2, // Standard sizing, visual only
+              height: orbitSize * 2,
+              perspective: '1200px',
+              transformStyle: 'preserve-3d',
+              pointerEvents: 'none', // Crucial: Don't block the Sensor with the huge square container
+              zIndex: 10 
+            }}
         >
-          {isClient && (
+           {isClient && (
             <motion.div
               style={{
                 position: 'relative',
@@ -220,8 +242,6 @@ const Team: React.FC = () => {
                 transformStyle: 'preserve-3d',
                 rotateY: rotation, 
                 rotateX: TILT_ANGLE, 
-                // ...but we ensure the rotation div itself doesn't block clicks
-                pointerEvents: 'none'
               }}
             >
               {teamMembers.map((member) => (
@@ -229,7 +249,8 @@ const Team: React.FC = () => {
                   key={member.id} 
                   member={member} 
                   orbitSize={orbitSize} 
-                  cardSize={cardSize} 
+                  cardSize={cardSize}
+                  setHover={setHover}
                 />
               ))}
             </motion.div>
